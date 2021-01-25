@@ -11,7 +11,7 @@ def loadImage(file_path):
 def loadSequence(prefix, suffix, length, height, width, color_depth):
     video = np.zeros((length, height, width, color_depth))
     for i in range(length):
-        image = loadImage(prefix + str(i+1) + suffix)
+        image = loadImage(f'{prefix}{i+1:03d}{suffix}')
         video[i, :, :, :] = image
     # gray = np.sum(video,3) / 3
     # return gray
@@ -142,7 +142,7 @@ def findEnds(mask):
 
 
 
-frames = loadSequence('motion/coral/coral-', '.png', 55, 216, 384, 3)
+frames = loadSequence('motion/coral-dense/coral-dense-', '.png', 55, 216, 384, 3)
 print(frames.shape)
 
 background = np.median(frames, 0)
@@ -166,3 +166,5 @@ for i in range(len(frames)):
     os.makedirs('output', exist_ok=True)
     mask = removeBackground(frames[i], background)
     exportImage(mask, f'./motion/output/mask-{i+1}.png')
+    exportImage((areas * 71) % 256 , f'./output/areas{i:03d}.png')
+    exportImage(mask, f'./output/mask-{i+1:03d}.png')
