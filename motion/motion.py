@@ -66,8 +66,9 @@ def filterSmallAreas(areas):
     max_value = int(np.round(np.max(areas)))
     for i in range(1, max_value):
         area_size = np.sum(areas == i)
-        if (area_size < 5):
+        if (area_size < 40):
             areas[areas == i] = 0
+    return areas
             #print(f'deleted {i}')
 def countAreas(areas):
     #print(np.unique(areas))
@@ -142,22 +143,27 @@ def findEnds(mask):
 
 
 
-frames = loadSequence('motion/coral-dense/coral-dense-', '.png', 55, 216, 384, 3)
+frames = loadSequence('motion/coral-dense/coral-dense-', '.png', 601, 216, 384, 3)
 print(frames.shape)
 
 background = np.median(frames, 0)
-
-for i in range(55):
+fakefish = 0
+for i in range(601):
     mask = getForegroundMask(frames[i], background)
     areas = identifyAreas(mask)
-    filterSmallAreas(areas)
+    areas = filterSmallAreas(areas)
     onscreenfish_count = countAreas(areas)
     if i==0:
         numberAreas(areas)
         last_areas = findCOA(areas, 0)
     else:
         last_areas, foundfish_count, onscreenfish_count, fish_count = trackAreas(areas, last_areas)
-        print('old fish: ', foundfish_count, ', onscreen fish: ', onscreenfish_count, ', total fish count: ', fish_count)
+        flast_areas, ffoundfish_count, fonscreenfish_count, ffish_count = trackAreas(areas, last_areas)
+        print(' old fish: ', foundfish_count, ',  onscreen fish: ', onscreenfish_count, ',  total fish count: ', fish_count)
+        print('fold fish: ', ffoundfish_count, ', fonscreen fish: ', fonscreenfish_count, ', ftotal fish count: ', ffish_count)
+        print('subtracted ', foundfish_count - ffoundfish_count, ',subtracted onsc: ', onscreenfish_count - fonscreenfish_count, ',subtracted tot cnt: ', fish_count - ffish_count)
+        fakefish = fakefish + fonscreenfish_count - ffoundfish_count
+        print('i = ',i,' _____ actual fish count: ', fish_count - fakefish, '_________________________________________')
 
 exportImage((areas * 71) % 256 , './motion/output/areas.png')
 exportImage(background, './motion/output/background2.png')
