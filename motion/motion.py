@@ -148,6 +148,7 @@ print(frames.shape)
 
 background = np.median(frames, 0)
 fakefish = 0
+totalfishcount = 0
 for i in range(601):
     mask = getForegroundMask(frames[i], background)
     areas = identifyAreas(mask)
@@ -159,18 +160,23 @@ for i in range(601):
     else:
         last_areas, foundfish_count, onscreenfish_count, fish_count = trackAreas(areas, last_areas)
         flast_areas, ffoundfish_count, fonscreenfish_count, ffish_count = trackAreas(areas, last_areas)
-        print(' old fish: ', foundfish_count, ',  onscreen fish: ', onscreenfish_count, ',  total fish count: ', fish_count)
-        print('fold fish: ', ffoundfish_count, ', fonscreen fish: ', fonscreenfish_count, ', ftotal fish count: ', ffish_count)
-        print('subtracted ', foundfish_count - ffoundfish_count, ',subtracted onsc: ', onscreenfish_count - fonscreenfish_count, ',subtracted tot cnt: ', fish_count - ffish_count)
+        #print(' old fish: ', foundfish_count, ',  onscreen fish: ', onscreenfish_count, ',  total fish count: ', fish_count)
+        #print('fold fish: ', ffoundfish_count, ', fonscreen fish: ', fonscreenfish_count, ', ftotal fish count: ', ffish_count)
+        #print('subtracted ', foundfish_count - ffoundfish_count, ',subtracted onsc: ', onscreenfish_count - fonscreenfish_count, ',subtracted tot cnt: ', fish_count - ffish_count)
         fakefish = fakefish + fonscreenfish_count - ffoundfish_count
-        print('i = ',i,' _____ actual fish count: ', fish_count - fakefish, '_________________________________________')
+        #print('i = ',i,' _____ actual fish count: ', fish_count - fakefish, '_________________________________________')
+        totalfishcount = totalfishcount + onscreenfish_count - ffoundfish_count
+        #print('estimated total: ' + str(totalfishcount))
 
 exportImage((areas * 71) % 256 , './motion/output/areas.png')
 exportImage(background, './motion/output/background2.png')
+print()
+print('Total fish count: ' + str(totalfishcount))
 
-for i in range(len(frames)):
-    os.makedirs('output', exist_ok=True)
-    mask = removeBackground(frames[i], background)
-    exportImage(mask, f'./motion/output/mask-{i+1}.png')
-    exportImage((areas * 71) % 256 , f'./output/areas{i:03d}.png')
-    exportImage(mask, f'./output/mask-{i+1:03d}.png')
+
+#for i in range(len(frames)):
+#    os.makedirs('output', exist_ok=True)
+#    mask = removeBackground(frames[i], background)
+#    exportImage(mask, f'./motion/output/mask-{i+1}.png')
+#    exportImage((areas * 71) % 256 , f'./output/areas{i:03d}.png')
+#   exportImage(mask, f'./output/mask-{i+1:03d}.png')
