@@ -2,50 +2,8 @@ from PIL import Image
 import numpy as np
 import os
 import math
+import fish
 
-
-class Fish(object):
-    def __init__(self, mask, pic):
-        exportImage(255*mask, 'F:/pic.jpg')
-        height, width = mask.shape
-        self.lsize = np.sum(mask)
-        print('size: ' + str(self.lsize))
-        self.lvelocity = False
-        
-        [self.lhpos, self.lvpos] = self.getLpos(mask)
-        self.color = self.getColor(mask,pic)
-        print('color: ' + str(self.color))
-        
-    
-    def getLpos(self, mask):
-        height, width = mask.shape
-        n = 0
-        lvpos = 0
-        lhpos = 0
-        for i in range(height):
-            if n > self.lsize/2:
-                continue
-            else:
-                n = n + np.sum(mask[i,:])
-                lvpos = lvpos + 1 
-        print('Vpos: ' + str(lvpos))
-        n = 0
-        for i in range(width):
-            if n > self.lsize/2:
-                continue
-            else:
-                n = n + np.sum(mask[:,i])
-                lhpos = lhpos + 1
-        print('Hpos: ' + str(lhpos))
-        return lhpos, lvpos
-
-    def getColor(self, mask, pic):
-        color = []
-        for ch in range(3):
-            channel = pic[:,:,ch]  
-            exportImage(np.where(mask == 1, channel, 0), 'F:/ch.png')          
-            color.append(np.sum(np.where(mask == 1, channel, 0))/self.lsize)
-        return color
 
 
 
@@ -128,6 +86,7 @@ background = np.median(frames, 0)
 fakefish = 0
 totalfishcount = 0
 
+fishcatalog = []
 for i in range(601):
     mask = getForegroundMask(frames[i], background)
     areas = identifyAreas(mask)
@@ -135,11 +94,13 @@ for i in range(601):
     onscreenfish_count = countAreas(areas)
     newfish = []
     for j in np.unique(areas).tolist():
-        fishmask = np.where(areas == j, 1, 0)
-        newfish.append(Fish(fishmask, frames[i]))
+        if j!=0:
+            fishmask = np.where(areas == j, 1, 0)
+            newfish.append(fish.Fish(fishmask, frames[i]))
     if i==0:
-        totalfishcount = totalfishcount + onscreenfish_count
+        fishcatalog = newfish          
     else:
+        fish.findfish(newfish, fishcatalog)
         print (onscreenfish_count)
 
 
