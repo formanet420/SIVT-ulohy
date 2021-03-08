@@ -100,7 +100,7 @@ for i in range(601):
     if i==0:
         fishcatalog = newfish          
     else:
-        fish.findfish(newfish, fishcatalog)
+        fishcatalog = fish.findfish(newfish, fishcatalog)
         print (onscreenfish_count)
 
 

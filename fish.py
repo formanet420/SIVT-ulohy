@@ -70,9 +70,36 @@ class Fish(object):
             #print(self.getLpos())
             return self.getLpos()
         else:
-            print('this should not happen')
+            print('this might not happen')
             print(tuple(sum(x) for x in zip(self.lvelocity, self.getLpos())))
             return tuple(sum(x) for x in zip(self.lvelocity, self.getLpos()))
+
+    def addRec(self,fish):
+        [nx,ny] = fish.getLpos()
+        
+        self.lsize = fish.getLsize()
+        self.size.append(self.lsize)
+        
+        self.lcolor = fish.getLcolor()
+        self.color.append(self.lcolor)
+
+        self.lhpos, self.lvpos = [nx,ny]        #h = i (row), v = j (column)
+        self.hpos.append(self.lhpos)
+        self.vpos.append(self.lvpos)
+
+        self.lvelocity = self.guessDX()
+        self.velocity.append(self.lvelocity)
+        
+        self.n_observations += 1 
+
+    def guessDX(self):
+        if len(self.hpos) > 3:
+            n = 3
+        else:
+            n = len(self.hpos)
+        dh = (self.hpos[len(self.hpos)-1] - self.hpos[len(self.hpos)-1-n])/n
+        dv = (self.vpos[len(self.vpos)-1] - self.vpos[len(self.vpos)-1-n])/n
+        return dh, dv
 
 
 
@@ -95,6 +122,22 @@ def findfish(new, cat):
             simp.append(comparefish(nx,ny,nsize,ncolor, kx,ky,ksize,kcolor))
         print(simp)
         similarity.append(simp)
+    arr = np.array([np.array(xi) for xi in similarity])
+    [fishnum, catnum] = np.shape(arr)
+
+    for i in range(fishnum):
+        if np.sum(arr)==0:
+            print('run out of fish')
+            break
+        topfish = np.argmax(arr)
+        fishcol = (topfish % catnum) 
+        Ncat = math.floor((topfish/fishnum)-0.0001)
+        cat[Ncat].addRec(new[fishcol])
+
+        arr[:,fishcol] = 0
+        print(arr)
+        print()
+    return cat
 
 def comparefish(nx,ny,nsize,ncolor, kx,ky,ksize,kcolor):
     spatial_importance = 2
