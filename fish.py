@@ -70,8 +70,8 @@ class Fish(object):
             #print(self.getLpos())
             return self.getLpos()
         else:
-            print('this might not happen')
-            print(tuple(sum(x) for x in zip(self.lvelocity, self.getLpos())))
+            #print('this might not happen')
+            #print(tuple(sum(x) for x in zip(self.lvelocity, self.getLpos())))
             return tuple(sum(x) for x in zip(self.lvelocity, self.getLpos()))
 
     def addRec(self,fish):
@@ -120,23 +120,31 @@ def findfish(new, cat):
             #print(str(kx) + ' ' + str(ky) + ' ' + str(ksize) + ' ' + str(kcolor))
             #print('similatitty score: ' + str(comparefish(nx,ny,nsize,ncolor, kx,ky,ksize,kcolor)))
             simp.append(comparefish(nx,ny,nsize,ncolor, kx,ky,ksize,kcolor))
-        print(simp)
+        #print(simp)
         similarity.append(simp)
     arr = np.array([np.array(xi) for xi in similarity])
     [fishnum, catnum] = np.shape(arr)
 
     for i in range(fishnum):
-        if np.sum(arr)==0:
-            print('run out of fish')
-            break
+        if np.amax(arr)==0:
+            print('ran out of fish')
+            break   
         topfish = np.argmax(arr)
-        fishcol = (topfish % catnum) 
-        Ncat = math.floor((topfish/fishnum)-0.0001)
-        cat[Ncat].addRec(new[fishcol])
+        catcol = (topfish % catnum) 
+        Nfish = math.floor((topfish/catnum)-0.0001)
+        if np.amax(arr) > 0.2:
+            cat[catcol].addRec(new[Nfish])
+        else:
+            cat.append(new[Nfish])
+            cat[len(cat)-1].addRec(new[Nfish])
 
-        arr[:,fishcol] = 0
-        print(arr)
-        print()
+        #print (np.amax(arr))
+        arr[:,catcol] = 0
+        arr[Nfish,:] = 0
+        #print(arr)
+        
+        print('catalogged fish: ' + str(len(cat)))
+        
     return cat
 
 def comparefish(nx,ny,nsize,ncolor, kx,ky,ksize,kcolor):

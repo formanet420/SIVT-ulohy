@@ -3,7 +3,7 @@ import numpy as np
 import os
 import math
 import fish
-
+from matplotlib import pyplot as plot
 
 
 
@@ -87,6 +87,7 @@ fakefish = 0
 totalfishcount = 0
 
 fishcatalog = []
+catlen = []
 for i in range(601):
     mask = getForegroundMask(frames[i], background)
     areas = identifyAreas(mask)
@@ -101,7 +102,18 @@ for i in range(601):
         fishcatalog = newfish          
     else:
         fishcatalog = fish.findfish(newfish, fishcatalog)
-        print (onscreenfish_count)
+        catlen.append(len(fishcatalog))
+        #if i in [20,100,400,600]:
+        #    plot.plot(catlen)
+        #    plot.show()
+        
+        print ('onscreen fish: '+str(onscreenfish_count))
+
+print('total fish in video: ' + str(len(catlen)))
+
+
+
+
 
 
 
