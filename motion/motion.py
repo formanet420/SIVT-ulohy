@@ -136,7 +136,22 @@ def findEnds(mask):
     k = (startW+endW)/2
     return [j,k]
         
-
+def findCenters(areas):
+    height, width = areas.shape
+    hnum = 0
+    wnum = 0
+    for i in range(countAreas(areas)):
+        mask = np.where(areas == i)
+        n = np.sum(mask)
+        for j in range(height):
+            hnum = hnum + np.sum(mask[j,:]) * j 
+        
+        for j in range(width):
+            wnum = wnum + np.sum(mask[:,j]) * j 
+        
+        hcoa = hnum/n 
+        wcoa = wnum/n
+        print(str(hcoa)+'  ' +str(wcoa))
 
 
         
@@ -153,20 +168,12 @@ for i in range(601):
     mask = getForegroundMask(frames[i], background)
     areas = identifyAreas(mask)
     areas = filterSmallAreas(areas)
+    findCenters(areas)
     onscreenfish_count = countAreas(areas)
     if i==0:
-        numberAreas(areas)
-        last_areas = findCOA(areas, 0)
+        totalfishcount = totalfishcount + onscreenfish_count
     else:
-        last_areas, foundfish_count, onscreenfish_count, fish_count = trackAreas(areas, last_areas)
-        flast_areas, ffoundfish_count, fonscreenfish_count, ffish_count = trackAreas(areas, last_areas)
-        #print(' old fish: ', foundfish_count, ',  onscreen fish: ', onscreenfish_count, ',  total fish count: ', fish_count)
-        #print('fold fish: ', ffoundfish_count, ', fonscreen fish: ', fonscreenfish_count, ', ftotal fish count: ', ffish_count)
-        #print('subtracted ', foundfish_count - ffoundfish_count, ',subtracted onsc: ', onscreenfish_count - fonscreenfish_count, ',subtracted tot cnt: ', fish_count - ffish_count)
-        fakefish = fakefish + fonscreenfish_count - ffoundfish_count
-        #print('i = ',i,' _____ actual fish count: ', fish_count - fakefish, '_________________________________________')
-        totalfishcount = totalfishcount + onscreenfish_count - ffoundfish_count
-        #print('estimated total: ' + str(totalfishcount))
+        print (onscreenfish_count)
 
 exportImage((areas * 71) % 256 , './motion/output/areas.png')
 exportImage(background, './motion/output/background2.png')
